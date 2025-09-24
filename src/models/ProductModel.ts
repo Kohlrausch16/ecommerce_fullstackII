@@ -20,5 +20,34 @@ export const ProductModel = {
       console.error('Erro ao buscar produto:', error);
       return null;
     }
+  },
+
+  create: async (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> => {
+    try {
+      const response = await api.post<Product>('/produto', productData);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao criar produto:', error);
+      throw error;
+    }
+  },
+
+  update: async (id: string, productData: Partial<Product>): Promise<Product> => {
+    try {
+      const response = await api.put<Product>(`/produto/${id}`, productData);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao atualizar produto:', error);
+      throw error;
+    }
+  },
+
+  delete: async (id: string): Promise<void> => {
+    try {
+      await api.delete(`/produto/${id}`);
+    } catch (error) {
+      console.error('Erro ao excluir produto:', error);
+      throw error;
+    }
   }
 };

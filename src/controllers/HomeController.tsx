@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { ProductModel } from '../models/ProductModel';
+import { Product } from '../types/Products';
+import Header from '../views/components/Header';
 import HomeView from '../views/pages/HomeView';
+import AdminFloatingButton from '../views/components/AdminFloatingButton';
 
 const HomeController: React.FC = () => {
-  const [products, setProducts] = useState<any[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -16,9 +20,11 @@ const HomeController: React.FC = () => {
       setLoading(true);
       setError('');
       const productsData = await ProductModel.getAll();
-      setProducts(productsData);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao carregar produtos');
+      setAllProducts(productsData);
+      setFilteredProducts(productsData); // Inicialmente mostra todos
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar produtos';
+      setError(errorMessage);
       console.error('Erro:', err);
     } finally {
       setLoading(false);
@@ -29,13 +35,30 @@ const HomeController: React.FC = () => {
     loadProducts();
   };
 
+  const handleSearch = (searchTerm: string) => {
+    if (!searchTerm) {
+      setFilteredProducts(allProducts);
+    } else {
+      const filtered = allProducts.filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredProducts(filtered);
+    }
+  };
+
   return (
-    <HomeView
-      products={products}
-      loading={loading}
-      error={error}
-      onRetry={handleRetry}
-    />
+    <>
+      <Header onSearch={handleSearch} />
+      <HomeView
+        products={filteredProducts}
+        loading={loading}
+        error={error}
+        onRetry={handleRetry}
+        onProductUpdate={loadProducts}
+      />
+      <AdminFloatingButton />
+    </>
   );
 };
 

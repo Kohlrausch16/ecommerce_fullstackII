@@ -1,17 +1,41 @@
-  import axios from "axios";
+import axios from "axios";
 
-  const api = axios.create({
-    baseURL: "http://localhost:3000",
-    timeout: 10000,
-  });
+const api = axios.create({
+  baseURL: "http://localhost:3000",
+  timeout: 10000,
+});
 
-  // Intercepta requests e injeta token (se existir no localStorage)
-  api.interceptors.request.use((config) => {
-    const token = localStorage.getItem("accessToken");
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("accessToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+    config.headers['token'] = token;
+  }
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => {
+    const token = response.headers['token'];
+    const refreshToken = response.headers['refresh_token'];
+    
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      localStorage.setItem('accessToken', token);
     }
-    return config;
-  });
+    if (refreshToken) {
+      localStorage.setItem('refreshToken', refreshToken);
+    }
+    
+    return response;
+  },
+  (error) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+    }
+    return Promise.reject(error);
+  }
+);
 
-  export default api;
+export default api;

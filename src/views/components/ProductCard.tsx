@@ -1,42 +1,141 @@
 import { Product } from "../../types/Products";
+import { useAuth } from "../../hooks/useAuth";
+import { ProductModel } from "../../models/ProductModel";
 
 interface Props {
   product: Product;
+  onProductUpdate?: () => void;
 }
 
-const ProductCard = ({ product }: Props) => {
+const ProductCard = ({ product, onProductUpdate }: Props) => {
+  const { isAdmin } = useAuth();
+
+  const handleEdit = () => {
+    // fazer modal de edição
+    console.log('Editar produto:', product.id);
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm(`Tem certeza que deseja excluir o produto "${product.name}"?`)) {
+      try {
+        await ProductModel.delete(product.id);
+        alert('Produto excluído com sucesso!');
+        if (onProductUpdate) {
+          onProductUpdate();
+        }
+      } catch (error) {
+        console.error('Erro ao excluir produto:', error);
+        alert('Erro ao excluir produto. Tente novamente.');
+      }
+    }
+  };
+
   return (
     <div className="col">
-      <div className="card shadow-sm h-100">
-        <div className="card-body">
-          <h5 className="card-title">{product.name}</h5>
-          <p className="card-text">{product.description}</p>
-
-          <ul className="list-unstyled small text-muted">
-            <li>Preço: R$ {product.price.toFixed(2)}</li>
-            <li>
-              Dimensões: {product.height} x {product.width} x {product.length} cm
-            </li>
-            <li>Status: {product.status ? "Ativo ✅" : "Inativo ❌"}</li>
-          </ul>
-
-          {product.color && product.color.length > 0 && (
-            <div className="mb-2">
-              {product.color.map((c, i) => (
-                <span key={i} className="badge bg-secondary me-1">
-                  {c}
+      <div className="card border-0 shadow-sm h-100" style={{ transition: 'transform 0.2s ease', cursor: 'pointer' }}>
+        {/* Header do Card */}
+        <div className="card-header bg-white border-0 pt-4 pb-2">
+          <div className="d-flex justify-content-between align-items-start">
+            <div>
+              <h5 className="card-title mb-1 fw-bold text-dark">{product.name}</h5>
+              <div className="d-flex align-items-center">
+                <span className={`badge ${product.status ? 'bg-success' : 'bg-secondary'} me-2`}>
+                  {product.status ? 'Disponível' : 'Indisponível'}
                 </span>
-              ))}
+                <small className="text-muted">
+                  {new Date(product.createdAt).toLocaleDateString('pt-BR')}
+                </small>
+              </div>
             </div>
-          )}
-
-          <div className="d-flex justify-content-between">
-            <button className="btn btn-sm btn-outline-primary">Editar</button>
-            <button className="btn btn-sm btn-outline-danger">Excluir</button>
+            <div className="text-end">
+              <h4 className="text-primary fw-bold mb-0">
+                R$ {product.price.toFixed(2)}
+              </h4>
+            </div>
           </div>
         </div>
-        <div className="card-footer text-muted small">
-          Criado em: {new Date(product.createdAt).toLocaleDateString()}
+
+        {/* Corpo do Card */}
+        <div className="card-body pt-2">
+          <p className="card-text text-muted mb-3" style={{ fontSize: '0.95rem', lineHeight: '1.5' }}>
+            {product.description}
+          </p>
+
+          {/* Especificações */}
+          <div className="mb-3">
+            <h6 className="text-secondary mb-2" style={{ fontSize: '0.85rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Especificações
+            </h6>
+            <div className="row g-2">
+              <div className="col-12">
+                <div className="d-flex justify-content-between py-1" style={{ fontSize: '0.9rem' }}>
+                  <span className="text-muted">Dimensões:</span>
+                  <span className="fw-medium">{product.height} × {product.width} × {product.length} cm</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Cores disponíveis */}
+          {product.color && product.color.length > 0 && (
+            <div className="mb-3">
+              <h6 className="text-secondary mb-2" style={{ fontSize: '0.85rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Cores Disponíveis
+              </h6>
+              <div className="d-flex flex-wrap gap-1">
+                {product.color.map((c, i) => (
+                  <span 
+                    key={i} 
+                    className="badge bg-light text-dark border"
+                    style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
+                  >
+                    {c}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer do Card com botões */}
+        <div className="card-footer bg-white border-0 pt-0 pb-4">
+          {isAdmin ? (
+            <div className="d-grid gap-2 d-md-flex justify-content-md-center">
+              <button 
+                className="btn btn-outline-primary btn-sm flex-fill"
+                onClick={handleEdit}
+                title="Editar produto"
+                style={{ borderRadius: '8px', padding: '0.6rem 1rem' }}
+              >
+                <i className="bi bi-pencil me-2"></i>
+                Editar
+              </button>
+              <button 
+                className="btn btn-outline-danger btn-sm flex-fill"
+                onClick={handleDelete}
+                title="Excluir produto"
+                style={{ borderRadius: '8px', padding: '0.6rem 1rem' }}
+              >
+                <i className="bi bi-trash me-2"></i>
+                Excluir
+              </button>
+            </div>
+          ) : (
+            <div className="d-grid">
+              <button 
+                className="btn btn-primary"
+                style={{ 
+                  borderRadius: '8px', 
+                  padding: '0.8rem 1.5rem',
+                  fontWeight: '500',
+                  boxShadow: '0 4px 12px rgba(13, 110, 253, 0.15)'
+                }}
+              >
+                <i className="bi bi-cart-plus me-2"></i>
+                Adicionar ao Carrinho
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
