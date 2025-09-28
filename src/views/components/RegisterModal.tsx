@@ -53,7 +53,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ show, onHide, onSwitchToL
   };
 
   return (
-    <div className={`modal fade ${show ? 'show d-block' : ''}`} style={{ backgroundColor: show ? 'rgba(0,0,0,0.5)' : 'transparent' }}>
+    <div className={`modal fade ${show ? 'show d-block' : ''}`} style={{ backgroundColor: show ? 'rgba(0,0,0,0.5)' : 'transparent', zIndex: show ? 1070 : -1 }}>
       <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content">
           <div className="modal-header">

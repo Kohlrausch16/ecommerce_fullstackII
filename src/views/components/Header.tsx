@@ -124,6 +124,8 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
         tabIndex={-1}
         aria-labelledby="cartModalLabel"
         aria-hidden="true"
+        data-bs-backdrop="false"
+        data-bs-keyboard="true"
       >
         <div className="modal-dialog modal-lg modal-dialog-end">
           <div className="modal-content">

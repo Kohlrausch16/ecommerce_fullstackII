@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
 interface LoginModalProps {
@@ -12,6 +13,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ show, onHide, onSwitchToRegiste
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login, loading } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +29,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ show, onHide, onSwitchToRegiste
       setEmail('');
       setPassword('');
       onHide();
+      navigate('/'); // Redireciona para a home após login bem-sucedido
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Erro ao fazer login. Verifique suas credenciais.';
       setError(errorMessage);
@@ -41,7 +44,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ show, onHide, onSwitchToRegiste
   };
 
   return (
-    <div className={`modal fade ${show ? 'show d-block' : ''}`} style={{ backgroundColor: show ? 'rgba(0,0,0,0.5)' : 'transparent' }}>
+    <div className={`modal fade ${show ? 'show d-block' : ''}`} style={{ backgroundColor: show ? 'rgba(0,0,0,0.5)' : 'transparent', zIndex: show ? 1070 : -1 }}>
       <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content">
           <div className="modal-header">
