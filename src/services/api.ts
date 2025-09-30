@@ -16,16 +16,6 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (response) => {
-    const token = response.headers['token'];
-    const refreshToken = response.headers['refresh_token'];
-    
-    if (token) {
-      localStorage.setItem('accessToken', token);
-    }
-    if (refreshToken) {
-      localStorage.setItem('refreshToken', refreshToken);
-    }
-    
     return response;
   },
   (error) => {

@@ -12,14 +12,23 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ show, onHide, onSwitchToL
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [street, setStreet] = useState('');
+  const [number, setNumber] = useState('');
+  const [block, setBlock] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const { register, loading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !email || !password || !confirmPassword || !cpf || !phoneNumber || !street || !number || !block || !city || !state) {
       setError('Por favor, preencha todos os campos.');
       return;
     }
@@ -35,8 +44,28 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ show, onHide, onSwitchToL
     }
 
     try {
-      await register({ name, email, password, confirmPassword });
-      handleClose();
+      await register({ 
+        name, 
+        email, 
+        password, 
+        confirmPassword, 
+        cpf, 
+        phoneNumber, 
+        street, 
+        number, 
+        block, 
+        city, 
+        state 
+      });
+      setSuccess('Conta criada com sucesso! Redirecionando para o login...');
+      
+      setTimeout(() => {
+        onSwitchToLogin();
+        setTimeout(() => {
+          handleClose();
+        }, 100);
+      }, 1500);
+      
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Erro ao criar conta. Tente novamente.';
       setError(errorMessage);
@@ -48,7 +77,15 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ show, onHide, onSwitchToL
     setEmail('');
     setPassword('');
     setConfirmPassword('');
+    setCpf('');
+    setPhoneNumber('');
+    setStreet('');
+    setNumber('');
+    setBlock('');
+    setCity('');
+    setState('');
     setError('');
+    setSuccess('');
     onHide();
   };
 
@@ -59,7 +96,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ show, onHide, onSwitchToL
           <div className="modal-header">
             <h5 className="modal-title">
               <i className="bi bi-person-plus-fill me-2"></i>
-              Criar Conta
+              TESTE - FORMULÁRIO COMPLETO
             </h5>
             <button 
               type="button" 
@@ -74,6 +111,13 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ show, onHide, onSwitchToL
                 <div className="alert alert-danger" role="alert">
                   <i className="bi bi-exclamation-triangle-fill me-2"></i>
                   {error}
+                </div>
+              )}
+              
+              {success && (
+                <div className="alert alert-success" role="alert">
+                  <i className="bi bi-check-circle-fill me-2"></i>
+                  {success}
                 </div>
               )}
               
@@ -144,6 +188,142 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ show, onHide, onSwitchToL
                   disabled={loading}
                   placeholder="Confirme sua senha"
                 />
+              </div>
+
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="mb-3">
+                    <label htmlFor="cpf" className="form-label">
+                      <i className="bi bi-card-text me-2"></i>
+                      CPF
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="cpf"
+                      value={cpf}
+                      onChange={(e) => setCpf(e.target.value)}
+                      required
+                      disabled={loading}
+                      placeholder="000.000.000-00"
+                      maxLength={14}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="mb-3">
+                    <label htmlFor="phoneNumber" className="form-label">
+                      <i className="bi bi-telephone me-2"></i>
+                      Telefone
+                    </label>
+                    <input
+                      type="tel"
+                      className="form-control"
+                      id="phoneNumber"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      required
+                      disabled={loading}
+                      placeholder="(11) 99999-9999"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="col-md-8">
+                  <div className="mb-3">
+                    <label htmlFor="street" className="form-label">
+                      <i className="bi bi-geo-alt me-2"></i>
+                      Rua
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="street"
+                      value={street}
+                      onChange={(e) => setStreet(e.target.value)}
+                      required
+                      disabled={loading}
+                      placeholder="Nome da sua rua"
+                    />
+                  </div>
+                </div>
+                <div className="col-md-4">
+                  <div className="mb-3">
+                    <label htmlFor="number" className="form-label">
+                      <i className="bi bi-hash me-2"></i>
+                      Número
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="number"
+                      value={number}
+                      onChange={(e) => setNumber(e.target.value)}
+                      required
+                      disabled={loading}
+                      placeholder="123"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="mb-3">
+                    <label htmlFor="block" className="form-label">
+                      <i className="bi bi-building me-2"></i>
+                      Bairro
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="block"
+                      value={block}
+                      onChange={(e) => setBlock(e.target.value)}
+                      required
+                      disabled={loading}
+                      placeholder="Nome do bairro"
+                    />
+                  </div>
+                </div>
+                <div className="col-md-4">
+                  <div className="mb-3">
+                    <label htmlFor="city" className="form-label">
+                      <i className="bi bi-pin-map me-2"></i>
+                      Cidade
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="city"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      required
+                      disabled={loading}
+                      placeholder="São Paulo"
+                    />
+                  </div>
+                </div>
+                <div className="col-md-2">
+                  <div className="mb-3">
+                    <label htmlFor="state" className="form-label">
+                      UF
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="state"
+                      value={state}
+                      onChange={(e) => setState(e.target.value)}
+                      required
+                      disabled={loading}
+                      placeholder="SP"
+                      maxLength={2}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
             

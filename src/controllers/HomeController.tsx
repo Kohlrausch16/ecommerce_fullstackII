@@ -20,8 +20,11 @@ const HomeController: React.FC = () => {
       setLoading(true);
       setError('');
       const productsData = await ProductModel.getAll();
-      setAllProducts(productsData);
-      setFilteredProducts(productsData); // Inicialmente mostra todos
+      
+      const safeProductsData = Array.isArray(productsData) ? productsData : [];
+      
+      setAllProducts(safeProductsData);
+      setFilteredProducts(safeProductsData); 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar produtos';
       setError(errorMessage);

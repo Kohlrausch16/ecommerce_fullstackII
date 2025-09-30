@@ -5,10 +5,16 @@ export const ProductModel = {
   getAll: async (): Promise<Product[]> => {
     try {
       const response = await api.get<Product[]>('/produto');
-      return response.data;
+      
+      if (Array.isArray(response.data)) {
+        return response.data;
+      } else {
+        console.warn('API retornou dados que não são um array:', response.data);
+        return [];
+      }
     } catch (error) {
       console.error('Erro ao buscar produtos:', error);
-      return [];
+      throw new Error('Não foi possível carregar os produtos. Verifique se o servidor está rodando.');
     }
   },
 

@@ -78,7 +78,6 @@ class CartItemService {
     try {
       const allItems = await this.getCartItems();
       return allItems.filter(item => {
-        // Verificar se productId é string ou objeto Product
         if (typeof item.productId === 'string') {
           return item.productId === productId;
         } else {
@@ -91,18 +90,13 @@ class CartItemService {
     }
   }
 
-  /**
-   * Adicionar produto ao carrinho com verificação de existência
-   */
   async addProductToCart(productId: string, quantity: number, unitPrice: number): Promise<CartItem> {
     try {
       const totalAmount = quantity * unitPrice;
       
-      // Verificar se o produto já existe no carrinho
       const existingItems = await this.getCartItemsByProduct(productId);
       
       if (existingItems.length > 0) {
-        // Se existe, atualizar a quantidade e total
         const existingItem = existingItems[0];
         const newQuantity = existingItem.productQtd + quantity;
         const newTotal = newQuantity * unitPrice;
@@ -112,7 +106,6 @@ class CartItemService {
           totalAmount: newTotal
         });
       } else {
-        // Se não existe, criar novo item
         return await this.addCartItem({
           productQtd: quantity,
           totalAmount,
@@ -126,9 +119,6 @@ class CartItemService {
     }
   }
 
-  /**
-   * Atualizar quantidade de um produto no carrinho
-   */
   async updateProductQuantity(cartItemId: string, newQuantity: number, unitPrice: number): Promise<CartItem> {
     try {
       if (newQuantity <= 0) {
@@ -147,16 +137,10 @@ class CartItemService {
     }
   }
 
-  /**
-   * Calcular total de um item baseado na quantidade e preço unitário
-   */
   calculateItemTotal(quantity: number, unitPrice: number): number {
     return quantity * unitPrice;
   }
 
-  /**
-   * Limpar carrinho removendo todos os itens
-   */
   async clearCart(): Promise<void> {
     try {
       const items = await this.getCartItems();
