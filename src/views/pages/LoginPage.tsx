@@ -17,7 +17,6 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Se já estiver autenticado, redireciona para home
   if (isAuthenticated) {
     return <Navigate to="/home" replace />;
   }
@@ -27,7 +26,7 @@ const LoginPage: React.FC = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
-    setError(''); // Limpa erro quando usuário digita
+    setError('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
