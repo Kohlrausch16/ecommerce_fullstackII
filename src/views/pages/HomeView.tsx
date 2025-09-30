@@ -58,7 +58,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, loading, error, onRetry, 
               {safeProducts.length > 0 && (
                 <div className="text-end">
                   <div className="badge bg-primary fs-6 px-3 py-2">
-                    {safeProducts.length} produto{products.length !== 1 ? 's' : ''}
+                    {products.length} produto{products.length !== 1 ? 's' : ''}
                   </div>
                 </div>
               )}
@@ -67,7 +67,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, loading, error, onRetry, 
         </div>
         
         {/* Products Grid */}
-        {products.length === 0 ? (
+        {safeProducts.length === 0 ? (
           <div className="row justify-content-center">
             <div className="col-md-6 text-center">
               <div className="bg-white rounded-3 shadow-sm p-5">
@@ -81,7 +81,6 @@ const HomeView: React.FC<HomeViewProps> = ({ products, loading, error, onRetry, 
           </div>
         ) : (
           <div className="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
-            
             {products.map((product) => (
               <ProductCard 
                 key={product.id} 

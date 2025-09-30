@@ -10,6 +10,13 @@ export interface RegisterData {
   email: string;
   password: string;
   confirmPassword: string;
+  cpf: string;
+  phoneNumber: string;
+  street: string;
+  number: string;
+  block: string;
+  city: string;
+  state: string;
 }
 
 export interface LoginResponse {
@@ -23,21 +30,34 @@ export interface LoginResponse {
 }
 
 class AuthService {
-  async register(registerData: RegisterData): Promise<LoginResponse> {
+  async register(registerData: RegisterData): Promise<void> {
     try {
-      await api.post('/cliente', {
-        name: registerData.name,
-        email: registerData.email,
-        password: registerData.password
-      });
+      const nameParts = registerData.name.trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
       
-      const loginResponse = await this.login({
+      const clientData = {
+        firstName,
+        lastName,
+        cpf: registerData.cpf,
+        phoneNumber: registerData.phoneNumber,
         email: registerData.email,
-        password: registerData.password
-      });
+        password: registerData.password,
+        activeStatus: true,
+        adress: {
+          street: registerData.street,
+          number: registerData.number,
+          block: registerData.block,
+          city: registerData.city,
+          state: registerData.state
+        }
+      };
       
-      return loginResponse;
-    } catch {
+      const clientResponse = await api.post('/cliente', clientData);
+      console.log('Cliente cadastrado com sucesso!', clientResponse.data);
+      
+    } catch (error) {
+      console.error('Erro no cadastro:', error);
       throw new Error('Erro ao criar conta. Tente novamente.');
     }
   }
@@ -46,27 +66,60 @@ class AuthService {
     try {
       const response = await api.post('/login', loginData);
       
-      const token = response.headers['token'];
-      const refreshToken = response.headers['refresh_token'];
+      const token = response.data.token;
+      const refreshToken = response.data.refreshToken;
+      
       
       if (!token) {
-        throw new Error('Token não recebido');
+        throw new Error('Token não recebido do servidor');
       }
       
-      const user = {
-        id: Date.now().toString(),
-        email: loginData.email,
-        name: loginData.email.split('@')[0], 
-        role: loginData.email.includes('admin') ? 'admin' as const : 'client' as const
-      };
+      let user;
+      try {
+        const tokenParts = token.split('.');
+        if (tokenParts.length !== 3) {
+          throw new Error('Token inválido');
+        }
+        
+        const payloadBase64 = tokenParts[1];
+        const payloadDecoded = atob(payloadBase64);
+        const payload = JSON.parse(payloadDecoded);
+        
+        console.log('Payload decodificado do token:');
+        
+        user = {
+          id: payload?.id || Date.now().toString(),
+          email: payload?.email || loginData.email,
+          name: payload?.userName && payload.userName !== 'undefined undefined' 
+            ? payload.userName 
+            : (payload?.email ? payload.email.split('@')[0] : 'Usuário'),
+          role: loginData.email.includes('admin') ? 'admin' as const : 'client' as const
+        };
+      } catch (error) {
+        console.error('Erro ao decodificar token:', error);
+        user = {
+          id: Date.now().toString(),
+          email: loginData.email,
+          name: loginData.email.split('@')[0],
+          role: loginData.email.includes('admin') ? 'admin' as const : 'client' as const
+        };
+      }
       
       localStorage.setItem('accessToken', token);
       localStorage.setItem('refreshToken', refreshToken);
       localStorage.setItem('user', JSON.stringify(user));
       
       return { token, user };
-    } catch {
-      throw new Error('Erro ao fazer login. Verifique suas credenciais.');
+    } catch (error) {
+      console.error('Erro detalhado no login:', error);
+      
+      let errorMessage = 'Erro ao fazer login. Verifique suas credenciais.';
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      throw new Error(errorMessage);
     }
   }
 

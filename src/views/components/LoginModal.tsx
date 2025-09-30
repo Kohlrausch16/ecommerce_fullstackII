@@ -50,7 +50,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ show, onHide, onSwitchToRegiste
           <div className="modal-header">
             <h5 className="modal-title">
               <i className="bi bi-person-circle me-2"></i>
-              Entrar
+              LOGIN MODAL - TESTE
             </h5>
             <button 
               type="button" 

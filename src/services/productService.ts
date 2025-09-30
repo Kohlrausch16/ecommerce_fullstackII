@@ -1,9 +1,9 @@
 import api from "./api";
-import { ApiResponse, Product } from "../types/Products";
+import { Product } from "../types/Products";
 
 export const getProducts = async (): Promise<Product[]> => {
-  const response = await api.get<ApiResponse<Product[]>>("/produto");
-  console.log("Resposta da API:", response.data);
+  const response = await api.get<Product[]>("/produto");
+  // console.log("Resposta da API:", response.data);
   return response.data;
 };
 

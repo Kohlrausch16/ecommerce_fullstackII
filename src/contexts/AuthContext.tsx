@@ -24,6 +24,14 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+export const useAuth = (): AuthContextType => {
+  const context = React.useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -62,8 +70,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (registerData: RegisterData) => {
     setLoading(true);
     try {
-      const response = await authService.register(registerData);
-      setUser(response.user);
+      await authService.register(registerData);
     } finally {
       setLoading(false);
     }
