@@ -130,22 +130,20 @@ class IntegratedCartService {
     }
   }
 
-  async finalizePurchase(): Promise<Cart | null> {
-    try {
-      const cart = await cartService.getActiveCart();
-      
-      if (!cart) {
-        throw new Error('Nenhum carrinho ativo encontrado');
-      }
-      
-      return await cartService.updateCart(cart.id, {
-        activeStatus: false
-      });
-    } catch (error) {
-      console.error('Erro ao finalizar pedido:', error);
-      throw new Error('Não foi possível finalizar o pedido');
-    }
+  async finalizePurchase(): Promise<CartWithItems | null> {
+  try {
+    const cart = await cartService.getActiveCart();
+    if (!cart) throw new Error("Nenhum carrinho ativo encontrado");
+
+    await cartService.updateCart(cart.id, { activeStatus: false }); // Finaliza pedido
+
+    return this.getCartWithItems(cart.id); // Retorna carrinho completo com itens
+  } catch (error) {
+    console.error("Erro ao finalizar pedido:", error);
+    throw error;
   }
+}
+
 
   async getCartSummary(): Promise<{itemCount: number, totalAmount: number} | null> {
     try {
