@@ -91,9 +91,6 @@ class CartService {
     }
   }
 
-  /**
-   * Criar carrinho ativo para o usuário (método auxiliar)
-   */
   async createActiveCart(): Promise<Cart> {
     try {
       return await this.createCart({
@@ -107,9 +104,7 @@ class CartService {
     }
   }
 
-  /**
-   * Obter ou criar carrinho ativo (método auxiliar)
-   */
+ 
   async getOrCreateActiveCart(): Promise<Cart> {
     try {
       let cart = await this.getActiveCart();
@@ -125,9 +120,7 @@ class CartService {
     }
   }
 
-  /**
-   * Calcular total do carrinho com base nos itens (método auxiliar)
-   */
+
   calculateCartTotal(items: { totalAmount: number }[]): number {
     return items.reduce((total, item) => total + item.totalAmount, 0);
   }

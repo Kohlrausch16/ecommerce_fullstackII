@@ -44,31 +44,26 @@ api.interceptors.response.use(
           const newToken = refreshResponse.data.token;
           const newRefreshToken = refreshResponse.data.refreshToken;
           
-          // Atualiza os tokens no localStorage
           localStorage.setItem('accessToken', newToken);
           if (newRefreshToken) {
             localStorage.setItem('refreshToken', newRefreshToken);
           }
           
-          // Atualiza os headers da requisição original
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
           originalRequest.headers['token'] = newToken;
           if (newRefreshToken) {
             originalRequest.headers['refresh_token'] = newRefreshToken;
           }
           
-          // Refaz a requisição original com o novo token
           return api(originalRequest);
         } catch (refreshError) {
           console.error('Erro ao renovar token:', refreshError);
-          // Se falhou ao renovar, faz logout
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
           localStorage.removeItem('user');
           window.location.href = '/login';
         }
       } else {
-        // Se não tem refresh token, faz logout
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
@@ -76,7 +71,6 @@ api.interceptors.response.use(
       }
     }
     
-    // Para outros erros de autenticação/autorização
     if (error.response?.status === 403) {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');

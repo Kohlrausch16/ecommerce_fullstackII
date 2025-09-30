@@ -29,9 +29,7 @@ class ClientService {
 
   async getClientById(id: string): Promise<Client> {
     try {
-      console.log('Buscando cliente com ID:', id);
       const response = await api.get(`/cliente/${id}`);
-      console.log('Resposta do cliente:', response.data);
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar cliente:', error);
@@ -68,9 +66,6 @@ class ClientService {
     }
   }
 
-  /**
-   * Busca o cartId do cliente logado
-   */
   async getClientCartId(clientId: string): Promise<string | null> {
     try {
       const client = await this.getClientById(clientId);
@@ -81,9 +76,6 @@ class ClientService {
     }
   }
 
-  /**
-   * Busca os dados completos do cliente logado incluindo cartId
-   */
   async getLoggedClientData(): Promise<Client | null> {
     try {
       const userData = localStorage.getItem('user');
@@ -103,9 +95,6 @@ class ClientService {
     }
   }
 
-  /**
-   * Método de debug para verificar cartId do cliente logado
-   */
   async debugClientCart(): Promise<void> {
     try {
       const userData = localStorage.getItem('user');
@@ -132,7 +121,6 @@ class ClientService {
 
 const clientService = new ClientService();
 
-// Adiciona ao window para debug fácil
 if (typeof window !== 'undefined') {
   (window as any).debugClientCart = () => clientService.debugClientCart();
 }

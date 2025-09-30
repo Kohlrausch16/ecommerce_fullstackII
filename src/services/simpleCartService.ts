@@ -139,9 +139,6 @@ class SimpleCartService {
     }
   }
 
-  /**
-   * Obtém o carrinho com todos os itens
-   */
   async getCartWithItems(): Promise<CartWithItems> {
     const items = this.getStoredItems();
     
@@ -154,13 +151,9 @@ class SimpleCartService {
     };
   }
 
-  /**
-   * Limpa o carrinho
-   */
   async clearCart(): Promise<Cart> {
     const items = this.getStoredItems();
     
-    // Tenta limpar no backend
     for (const item of items) {
       try {
         await cartItemService.removeCartItem(item.id);
@@ -169,7 +162,6 @@ class SimpleCartService {
       }
     }
 
-    // Limpa localStorage
     this.saveItems([]);
 
     return {

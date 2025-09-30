@@ -34,7 +34,6 @@ class IntegratedCartService {
       
       const result = await realCartService.addProductToCart(productId, quantity, unitPrice);
       
-      console.log('Produto adicionado:', result);
       
       const cart: Cart = result.cart || {
         id: 'temp-cart',
