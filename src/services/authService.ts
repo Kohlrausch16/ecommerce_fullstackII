@@ -21,6 +21,7 @@ export interface RegisterData {
 
 export interface LoginResponse {
   token: string;
+  refreshToken: string;
   user: {
     id: string;
     email: string;
@@ -85,7 +86,7 @@ class AuthService {
         const payloadDecoded = atob(payloadBase64);
         const payload = JSON.parse(payloadDecoded);
         
-        console.log('Payload decodificado do token:');
+        console.log('Payload decodificado do token:', payload);
         
         user = {
           id: payload?.id || Date.now().toString(),
@@ -109,7 +110,7 @@ class AuthService {
       localStorage.setItem('refreshToken', refreshToken);
       localStorage.setItem('user', JSON.stringify(user));
       
-      return { token, user };
+      return { token, refreshToken, user };
     } catch (error) {
       console.error('Erro detalhado no login:', error);
       
@@ -146,6 +147,40 @@ class AuthService {
 
   getToken(): string | null {
     return localStorage.getItem('accessToken');
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refreshToken');
+  }
+
+  async refreshToken(): Promise<boolean> {
+    try {
+      const refreshToken = this.getRefreshToken();
+      if (!refreshToken) {
+        throw new Error('Refresh token não encontrado');
+      }
+
+      const response = await api.post('/refresh-token', {
+        refreshToken: refreshToken
+      });
+
+      const newToken = response.data.token;
+      const newRefreshToken = response.data.refreshToken;
+
+      if (newToken) {
+        localStorage.setItem('accessToken', newToken);
+        if (newRefreshToken) {
+          localStorage.setItem('refreshToken', newRefreshToken);
+        }
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error('Erro ao renovar token:', error);
+      this.logout();
+      return false;
+    }
   }
 }
 

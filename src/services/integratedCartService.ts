@@ -1,19 +1,17 @@
-import cartService from './cartService';
 import cartItemService from './cartItemService';
+import realCartService from './realCartService';
 import { Cart, CartItem, CartWithItems } from '../types/Cart';
 
 class IntegratedCartService {
   
   async getCartWithItems(cartId: string): Promise<CartWithItems> {
     try {
-      const cart = await cartService.getCartById(cartId);
-      const allItems = await cartItemService.getCartItems();
-      
-      const cartItems = allItems.filter(item => item.activeStatus);
-      
-      return {
-        ...cart,
-        items: cartItems
+      return await realCartService.getCartWithItems() || {
+        id: cartId,
+        totalOrder: 0,
+        activeStatus: true,
+        cartItemId: [],
+        items: []
       };
     } catch (error) {
       console.error('Erro ao buscar carrinho com itens:', error);
@@ -23,19 +21,7 @@ class IntegratedCartService {
 
   async getActiveCartWithItems(): Promise<CartWithItems | null> {
     try {
-      const cart = await cartService.getActiveCart();
-      
-      if (!cart) {
-        return null;
-      }
-      
-      const allItems = await cartItemService.getCartItems();
-      const cartItems = allItems.filter(item => item.activeStatus);
-      
-      return {
-        ...cart,
-        items: cartItems
-      };
+      return await realCartService.getCartWithItems();
     } catch (error) {
       console.error('Erro ao buscar carrinho ativo com itens:', error);
       return null;
@@ -44,67 +30,47 @@ class IntegratedCartService {
 
   async addProductToActiveCart(productId: string, quantity: number, unitPrice: number): Promise<{cart: Cart, item: CartItem}> {
     try {
-      const cart = await cartService.getOrCreateActiveCart();
+      console.log('Adicionando produto ao carrinho:', { productId, quantity, unitPrice });
       
-      const item = await cartItemService.addProductToCart(productId, quantity, unitPrice);
+      const result = await realCartService.addProductToCart(productId, quantity, unitPrice);
       
-      const allItems = await cartItemService.getCartItems();
-      const activeItems = allItems.filter(item => item.activeStatus);
-      const newTotal = cartService.calculateCartTotal(activeItems);
+      console.log('Produto adicionado:', result);
       
-      const updatedCart = await cartService.updateCart(cart.id, {
-        totalOrder: newTotal
-      });
+      const cart: Cart = result.cart || {
+        id: 'temp-cart',
+        totalOrder: quantity * unitPrice,
+        activeStatus: true,
+        cartItemId: [result.item.id]
+      } as Cart;
       
-      return { cart: updatedCart, item };
+      return { cart, item: result.item };
     } catch (error) {
       console.error('Erro ao adicionar produto ao carrinho ativo:', error);
-      throw new Error('Não foi possível adicionar o produto ao carrinho');
+      throw error;
     }
   }
 
   async removeProductFromActiveCart(cartItemId: string): Promise<Cart | null> {
     try {
-      await cartItemService.removeCartItem(cartItemId);
-      
-      const cart = await cartService.getActiveCart();
-      
-      if (!cart) {
-        return null;
-      }
-      
-      const allItems = await cartItemService.getCartItems();
-      const activeItems = allItems.filter(item => item.activeStatus);
-      const newTotal = cartService.calculateCartTotal(activeItems);
-      
-      return await cartService.updateCart(cart.id, {
-        totalOrder: newTotal
-      });
+      return await realCartService.removeItemFromCart(cartItemId);
     } catch (error) {
       console.error('Erro ao remover produto do carrinho:', error);
       throw new Error('Não foi possível remover o produto do carrinho');
     }
   }
 
-  async updateProductQuantityInActiveCart(cartItemId: string, newQuantity: number, unitPrice: number): Promise<{cart: Cart, item: CartItem}> {
+  async updateProductQuantityInActiveCart(cartItemId: string, newQuantity: number): Promise<{cart: Cart, item: CartItem}> {
     try {
-      const item = await cartItemService.updateProductQuantity(cartItemId, newQuantity, unitPrice);
+      const result = await realCartService.updateItemQuantity(cartItemId, newQuantity);
       
-      const cart = await cartService.getActiveCart();
+      const cart: Cart = result.cart || {
+        id: 'temp-cart',
+        totalOrder: result.item.totalAmount,
+        activeStatus: true,
+        cartItemId: [cartItemId]
+      } as Cart;
       
-      if (!cart) {
-        throw new Error('Carrinho ativo não encontrado');
-      }
-      
-      const allItems = await cartItemService.getCartItems();
-      const activeItems = allItems.filter(item => item.activeStatus);
-      const newTotal = cartService.calculateCartTotal(activeItems);
-      
-      const updatedCart = await cartService.updateCart(cart.id, {
-        totalOrder: newTotal
-      });
-      
-      return { cart: updatedCart, item };
+      return { cart, item: result.item };
     } catch (error) {
       console.error('Erro ao atualizar quantidade do produto:', error);
       throw new Error('Não foi possível atualizar a quantidade do produto');
@@ -113,17 +79,7 @@ class IntegratedCartService {
 
   async clearActiveCart(): Promise<Cart | null> {
     try {
-      await cartItemService.clearCart();
-      
-      const cart = await cartService.getActiveCart();
-      
-      if (!cart) {
-        return null;
-      }
-      
-      return await cartService.updateCart(cart.id, {
-        totalOrder: 0
-      });
+      return await realCartService.clearCart();
     } catch (error) {
       console.error('Erro ao limpar carrinho ativo:', error);
       throw new Error('Não foi possível limpar o carrinho');
@@ -131,34 +87,31 @@ class IntegratedCartService {
   }
 
   async finalizePurchase(): Promise<CartWithItems | null> {
-  try {
-    const cart = await cartService.getActiveCart();
-    if (!cart) throw new Error("Nenhum carrinho ativo encontrado");
-
-    await cartService.updateCart(cart.id, { activeStatus: false }); // Finaliza pedido
-
-    return this.getCartWithItems(cart.id); // Retorna carrinho completo com itens
-  } catch (error) {
-    console.error("Erro ao finalizar pedido:", error);
-    throw error;
+    try {
+      console.log("Finalizando pedido...");
+      
+      const currentCart = await realCartService.getCartWithItems();
+      
+      if (!currentCart) {
+        throw new Error("Nenhum carrinho encontrado para finalizar");
+      }
+      
+      await realCartService.clearCart();
+      
+      return {
+        ...currentCart,
+        activeStatus: false
+      };
+    } catch (error) {
+      console.error("Erro ao finalizar pedido:", error);
+      throw error;
+    }
   }
-}
 
 
   async getCartSummary(): Promise<{itemCount: number, totalAmount: number} | null> {
     try {
-      const cartWithItems = await this.getActiveCartWithItems();
-      
-      if (!cartWithItems) {
-        return null;
-      }
-      
-      const itemCount = cartWithItems.items.reduce((count, item) => count + item.productQtd, 0);
-      
-      return {
-        itemCount,
-        totalAmount: cartWithItems.totalOrder
-      };
+      return await realCartService.getCartSummary();
     } catch (error) {
       console.error('Erro ao obter resumo do carrinho:', error);
       return null;

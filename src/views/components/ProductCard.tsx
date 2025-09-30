@@ -1,6 +1,8 @@
 import { Product } from "../../types/Products";
 import { useAuth } from "../../hooks/useAuth";
 import { ProductModel } from "../../models/ProductModel";
+import useCart from "../../hooks/useCart";
+import { useState } from "react";
 
 interface Props {
   product: Product;
@@ -9,6 +11,8 @@ interface Props {
 
 const ProductCard = ({ product, onProductUpdate }: Props) => {
   const { isAdmin } = useAuth();
+  const { addProduct } = useCart();
+  const [loadingCart, setLoadingCart] = useState(false);
 
   const handleEdit = () => {
     // fazer modal de edição
@@ -27,6 +31,19 @@ const ProductCard = ({ product, onProductUpdate }: Props) => {
         console.error('Erro ao excluir produto:', error);
         alert('Erro ao excluir produto. Tente novamente.');
       }
+    }
+  };
+
+  const handleAddToCart = async () => {
+    try {
+      setLoadingCart(true);
+      await addProduct(product.id, 1, product.price);
+      alert(`${product.name} foi adicionado ao carrinho!`);
+    } catch (error) {
+      console.error('Erro ao adicionar produto ao carrinho:', error);
+      alert('Erro ao adicionar produto ao carrinho. Tente novamente.');
+    } finally {
+      setLoadingCart(false);
     }
   };
 
@@ -124,6 +141,8 @@ const ProductCard = ({ product, onProductUpdate }: Props) => {
             <div className="d-grid">
               <button 
                 className="btn btn-primary"
+                onClick={handleAddToCart}
+                disabled={loadingCart || !product.status}
                 style={{ 
                   borderRadius: '8px', 
                   padding: '0.8rem 1.5rem',
@@ -131,8 +150,17 @@ const ProductCard = ({ product, onProductUpdate }: Props) => {
                   boxShadow: '0 4px 12px rgba(13, 110, 253, 0.15)'
                 }}
               >
-                <i className="bi bi-cart-plus me-2"></i>
-                Adicionar ao Carrinho
+                {loadingCart ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Adicionando...
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-cart-plus me-2"></i>
+                    {product.status ? 'Adicionar ao Carrinho' : 'Produto Indisponível'}
+                  </>
+                )}
               </button>
             </div>
           )}

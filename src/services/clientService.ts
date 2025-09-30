@@ -5,6 +5,7 @@ export interface Client {
   name: string;
   email: string;
   password?: string;
+  cartId?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -28,7 +29,9 @@ class ClientService {
 
   async getClientById(id: string): Promise<Client> {
     try {
+      console.log('Buscando cliente com ID:', id);
       const response = await api.get(`/cliente/${id}`);
+      console.log('Resposta do cliente:', response.data);
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar cliente:', error);
@@ -64,6 +67,74 @@ class ClientService {
       throw error;
     }
   }
+
+  /**
+   * Busca o cartId do cliente logado
+   */
+  async getClientCartId(clientId: string): Promise<string | null> {
+    try {
+      const client = await this.getClientById(clientId);
+      return client.cartId || null;
+    } catch (error) {
+      console.error('Erro ao buscar cartId do cliente:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Busca os dados completos do cliente logado incluindo cartId
+   */
+  async getLoggedClientData(): Promise<Client | null> {
+    try {
+      const userData = localStorage.getItem('user');
+      if (!userData) {
+        return null;
+      }
+
+      const user = JSON.parse(userData);
+      if (!user.id) {
+        return null;
+      }
+
+      return await this.getClientById(user.id);
+    } catch (error) {
+      console.error('Erro ao buscar dados do cliente logado:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Método de debug para verificar cartId do cliente logado
+   */
+  async debugClientCart(): Promise<void> {
+    try {
+      const userData = localStorage.getItem('user');
+      console.log('=== DEBUG CLIENTE CART ===');
+      console.log('User data do localStorage:', userData);
+      
+      if (userData) {
+        const user = JSON.parse(userData);
+        console.log('User parseado:', user);
+        console.log('ID do usuário:', user.id);
+        
+        if (user.id) {
+          const client = await this.getClientById(user.id);
+          console.log('Dados completos do cliente:', client);
+          console.log('CartId do cliente:', client.cartId);
+        }
+      }
+      console.log('=== FIM DEBUG ===');
+    } catch (error) {
+      console.error('Erro no debug:', error);
+    }
+  }
 }
 
-export default new ClientService();
+const clientService = new ClientService();
+
+// Adiciona ao window para debug fácil
+if (typeof window !== 'undefined') {
+  (window as any).debugClientCart = () => clientService.debugClientCart();
+}
+
+export default clientService;

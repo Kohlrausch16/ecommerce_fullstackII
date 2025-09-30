@@ -2,25 +2,19 @@ import api from './api';
 import { CartItem, CreateCartItemData, UpdateCartItemData } from '../types/Cart';
 
 class CartItemService {
-  /**
-   * Buscar todos os itens do carrinho
-   */
   async getCartItems(): Promise<CartItem[]> {
     try {
-      const response = await api.get('/cart-item');
-      return response.data;
+      console.warn('Rota GET /item-carrinho não implementada no backend');
+      return [];
     } catch (error) {
       console.error('Erro ao buscar itens do carrinho:', error);
-      throw new Error('Não foi possível buscar os itens do carrinho');
+      return [];
     }
   }
 
-  /**
-   * Buscar item do carrinho por ID
-   */
   async getCartItemById(id: string): Promise<CartItem> {
     try {
-      const response = await api.get(`/cart-item/${id}`);
+      const response = await api.get(`/item-carrinho/${id}`);
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar item do carrinho:', error);
@@ -28,12 +22,9 @@ class CartItemService {
     }
   }
 
-  /**
-   * Adicionar item ao carrinho
-   */
   async addCartItem(itemData: CreateCartItemData): Promise<CartItem> {
     try {
-      const response = await api.post('/cart-item', {
+      const response = await api.post('/item-carrinho', {
         productQtd: itemData.productQtd,
         totalAmount: itemData.totalAmount,
         activeStatus: itemData.activeStatus ?? true,
@@ -46,12 +37,9 @@ class CartItemService {
     }
   }
 
-  /**
-   * Atualizar item do carrinho
-   */
   async updateCartItem(id: string, itemData: UpdateCartItemData): Promise<CartItem> {
     try {
-      const response = await api.put(`/cart-item/${id}`, itemData);
+      const response = await api.put(`/item-carrinho/${id}?qtd=${itemData.productQtd}`);
       return response.data;
     } catch (error) {
       console.error('Erro ao atualizar item do carrinho:', error);
@@ -59,21 +47,15 @@ class CartItemService {
     }
   }
 
-  /**
-   * Remover item do carrinho
-   */
   async removeCartItem(id: string): Promise<void> {
     try {
-      await api.delete(`/cart-item/${id}`);
+      await api.delete(`/item-carrinho/${id}`);
     } catch (error) {
       console.error('Erro ao remover item do carrinho:', error);
       throw new Error('Não foi possível remover o item do carrinho');
     }
   }
 
-  /**
-   * Buscar itens por produto (método auxiliar)
-   */
   async getCartItemsByProduct(productId: string): Promise<CartItem[]> {
     try {
       const allItems = await this.getCartItems();
@@ -119,17 +101,14 @@ class CartItemService {
     }
   }
 
-  async updateProductQuantity(cartItemId: string, newQuantity: number, unitPrice: number): Promise<CartItem> {
+  async updateProductQuantity(cartItemId: string, newQuantity: number): Promise<CartItem> {
     try {
       if (newQuantity <= 0) {
         throw new Error('Quantidade deve ser maior que zero');
       }
       
-      const newTotal = newQuantity * unitPrice;
-      
       return await this.updateCartItem(cartItemId, {
-        productQtd: newQuantity,
-        totalAmount: newTotal
+        productQtd: newQuantity
       });
     } catch (error) {
       console.error('Erro ao atualizar quantidade:', error);
