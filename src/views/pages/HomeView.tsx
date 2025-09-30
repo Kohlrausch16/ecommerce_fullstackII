@@ -10,6 +10,7 @@ interface HomeViewProps {
 }
 
 const HomeView: React.FC<HomeViewProps> = ({ products, loading, error, onRetry, onProductUpdate }) => {
+  const safeProducts = Array.isArray(products) ? products : [];
   if (loading) {
     return (
       <div className="text-center mt-5">
@@ -54,10 +55,10 @@ const HomeView: React.FC<HomeViewProps> = ({ products, loading, error, onRetry, 
                 </h1>
                 <p className="text-muted mb-0">Descubra nossa seleção premium de relógios</p>
               </div>
-              {products.length > 0 && (
+              {safeProducts.length > 0 && (
                 <div className="text-end">
                   <div className="badge bg-primary fs-6 px-3 py-2">
-                    {products.length} produto{products.length !== 1 ? 's' : ''}
+                    {safeProducts.length} produto{products.length !== 1 ? 's' : ''}
                   </div>
                 </div>
               )}
@@ -80,6 +81,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, loading, error, onRetry, 
           </div>
         ) : (
           <div className="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+            
             {products.map((product) => (
               <ProductCard 
                 key={product.id} 

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { integratedCartService } from '../services';
-import { CartWithItems } from '../types/Cart';
-
+import { CartWithItems, Cart } from '../types/Cart';
 interface UseCartReturn {
   cart: CartWithItems | null;
   loading: boolean;
@@ -11,7 +10,7 @@ interface UseCartReturn {
   removeProduct: (cartItemId: string) => Promise<void>;
   updateQuantity: (cartItemId: string, newQuantity: number, unitPrice: number) => Promise<void>;
   clearCart: () => Promise<void>;
-  finalizePurchase: () => Promise<void>;
+  finalizePurchase: () => Promise<CartWithItems | null>;
   
   itemCount: number;
   totalAmount: number;
@@ -103,20 +102,30 @@ export const useCart = (): UseCartReturn => {
     }
   };
 
-  const finalizePurchase = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      await integratedCartService.finalizePurchase();
-      setCart(null); 
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erro ao finalizar compra';
+
+
+const finalizePurchase = async (): Promise<CartWithItems | null> => {
+  try {
+    setLoading(true);
+    setError(null);
+    const finalizedCart = await integratedCartService.finalizePurchase();
+    setCart(null);
+    return finalizedCart;
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : "Erro ao finalizar compra";
+    setError(errMsg);
+    throw err;
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+{/*
+  const errorMessage = err instanceof Error ? err.message : 'Erro ao finalizar compra';
       setError(errorMessage);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+  
+  */}
 
   const itemCount = cart?.items.reduce((count, item) => count + item.productQtd, 0) || 0;
   const totalAmount = cart?.totalOrder || 0;
