@@ -7,6 +7,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import HomeController from './controllers/HomeController';
 import LoginPage from './views/pages/LoginPage';
 import RegisterPage from './views/pages/RegisterPage';
+import ProfilePage from './views/pages/ProfilePage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -23,6 +24,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <HomeController />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/profile" 
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
                   </ProtectedRoute>
                 } 
               />

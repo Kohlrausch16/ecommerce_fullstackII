@@ -4,8 +4,7 @@ import { useAuth } from "../../hooks/useAuth";
 import useCart from "../../hooks/useCart"; 
 import LoginModal from "./LoginModal";
 import RegisterModal from "./RegisterModal";
-import { Modal, Button } from "react-bootstrap";
-import { Cart, CartWithItems } from "../../services";
+import { CartWithItems } from "../../types/Cart";
 
 interface HeaderProps {
   onSearch?: (searchTerm: string) => void;
@@ -49,8 +48,9 @@ const handleFinalizePurchase = async () => {
     setFinalizedOrder(finalizedCart);
     setShowOrderModal(true);
     await refreshCart();
-  } catch (error: any) {
-    setErrorFinalize(error.message || "Erro ao finalizar compra");
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erro ao finalizar compra";
+    setErrorFinalize(errorMessage);
   } finally {
     setLoadingFinalize(false);
   }
@@ -93,10 +93,14 @@ const handleFinalizePurchase = async () => {
           <div className="d-flex align-items-center">
             {isAuthenticated ? (
               <>
-                <span className="text-white me-3">
+                <Link 
+                  to="/profile" 
+                  className="text-white text-decoration-none me-3"
+                  title="Ver meu perfil"
+                >
                   <i className="bi bi-person-check me-1"></i>
                   Olá, {user?.name} {user?.role === "admin" && "(Admin)"}
-                </span>
+                </Link>
                 <button onClick={handleLogout} className="btn btn-link text-white me-3" title="Sair">
                   <i className="bi bi-box-arrow-right"></i> Sair
                 </button>
@@ -140,7 +144,7 @@ const handleFinalizePurchase = async () => {
           data-bs-backdrop="false"
           data-bs-keyboard="true"
         >
-          <div className="modal-dialog modal-lg modal-dialog-end">
+          <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title" id="cartModalLabel">Carrinho</h5>
@@ -181,37 +185,68 @@ const handleFinalizePurchase = async () => {
       </header>
 
       {/* Modal do resumo do pedido finalizado */}
-      <Modal show={showOrderModal} onHide={() => setShowOrderModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Pedido Finalizado</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {finalizedOrder ? (
-            <>
-              <p>Seu pedido foi realizado com sucesso!</p>
-              <p>Total de itens: {finalizedOrder.items.reduce((acc, item) => acc + item.productQtd, 0)}</p>
-              <p>Total da compra: R$ {finalizedOrder.totalOrder.toFixed(2)}</p>
-              <ul>
-                {finalizedOrder.items.map(item => (
-                  <li key={item.id}>
-                    {item.productQtd} x{" "}
-                      {typeof item.productId === "string" ? 
-                        item.productId : 
-                        item.productId.name // Usa campo nome do produto se for objeto
-                      } - R$ {item.totalAmount.toFixed(2)}
-                  </li>
-
-                ))}
-              </ul>
-            </>
-          ) : (
-            <p>Não há pedido para mostrar.</p>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowOrderModal(false)}>Fechar</Button>
-        </Modal.Footer>
-      </Modal>
+      <div className={`modal fade ${showOrderModal ? 'show d-block' : ''}`} 
+           style={{ backgroundColor: showOrderModal ? 'rgba(0,0,0,0.5)' : 'transparent', zIndex: showOrderModal ? 1070 : -1 }}>
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Pedido Finalizado</h5>
+              <button 
+                type="button" 
+                className="btn-close" 
+                onClick={() => setShowOrderModal(false)}
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              {finalizedOrder ? (
+                <>
+                  <div className="alert alert-success">
+                    <i className="bi bi-check-circle-fill me-2"></i>
+                    Seu pedido foi realizado com sucesso!
+                  </div>
+                  <div className="row mb-3">
+                    <div className="col-6">
+                      <strong>Total de itens:</strong> {finalizedOrder.items.reduce((acc, item) => acc + item.productQtd, 0)}
+                    </div>
+                    <div className="col-6 text-end">
+                      <strong>Total da compra:</strong> <span className="text-success">R$ {finalizedOrder.totalOrder.toFixed(2)}</span>
+                    </div>
+                  </div>
+                  <h6>Itens do pedido:</h6>
+                  <ul className="list-group list-group-flush">
+                    {finalizedOrder.items.map(item => (
+                      <li key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                          {item.productQtd} x{" "}
+                          {typeof item.productId === "string" ? 
+                            item.productId : 
+                            item.productId.name
+                          }
+                        </span>
+                        <span className="badge bg-primary rounded-pill">
+                          R$ {item.totalAmount.toFixed(2)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : (
+                <p>Não há pedido para mostrar.</p>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button 
+                type="button" 
+                className="btn btn-secondary" 
+                onClick={() => setShowOrderModal(false)}
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <LoginModal
         show={showLoginModal}

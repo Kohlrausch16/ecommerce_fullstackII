@@ -10,6 +10,23 @@ export interface Client {
   updatedAt?: string;
 }
 
+export interface UpdateClientData {
+  firstName: string;
+  lastName: string;
+  cpf: string;
+  phoneNumber: string;
+  email: string;
+  password: string;
+  activeStatus: boolean;
+  adress: {
+    street: string;
+    number: string;
+    block: string;
+    city: string;
+    state: string;
+  };
+}
+
 export interface CreateClientData {
   name: string;
   email: string;
@@ -53,6 +70,17 @@ class ClientService {
       return response.data;
     } catch (error) {
       console.error('Erro ao atualizar cliente:', error);
+      throw error;
+    }
+  }
+
+  async updateProfile(id: string, clientData: Partial<UpdateClientData>): Promise<Client> {
+    try {
+      // Use a rota correta - sem /profile
+      const response = await api.put(`/cliente/${id}`, clientData);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao atualizar perfil:', error);
       throw error;
     }
   }
