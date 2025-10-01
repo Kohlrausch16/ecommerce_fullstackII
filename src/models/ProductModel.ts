@@ -28,7 +28,7 @@ export const ProductModel = {
     }
   },
 
-  create: async (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> => {
+  create: async (productData: any): Promise<Product> => {
     try {
       const response = await api.post<Product>('/produto', productData);
       return response.data;
@@ -38,7 +38,7 @@ export const ProductModel = {
     }
   },
 
-  update: async (id: string, productData: Partial<Product>): Promise<Product> => {
+  update: async (id: string, productData: any): Promise<Product> => {
     try {
       const response = await api.put<Product>(`/produto/${id}`, productData);
       return response.data;

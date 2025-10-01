@@ -3,6 +3,8 @@ import { useAuth } from "../../hooks/useAuth";
 import { ProductModel } from "../../models/ProductModel";
 import useCart from "../../hooks/useCart";
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import ProductFormModal from "./ProductFormModal";
 
 interface Props {
   product: Product;
@@ -13,10 +15,16 @@ const ProductCard = ({ product, onProductUpdate }: Props) => {
   const { isAdmin } = useAuth();
   const { addProduct } = useCart();
   const [loadingCart, setLoadingCart] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const handleEdit = () => {
-    // fazer modal de edição
-    console.log('Editar produto:', product.id);
+    setShowEditModal(true);
+  };
+
+  const handleProductSaved = () => {
+    if (onProductUpdate) {
+      onProductUpdate();
+    }
   };
 
   const handleDelete = async () => {
@@ -54,7 +62,17 @@ const ProductCard = ({ product, onProductUpdate }: Props) => {
         <div className="card-header bg-white border-0 pt-4 pb-2">
           <div className="d-flex justify-content-between align-items-start">
             <div>
-              <h5 className="card-title mb-1 fw-bold text-dark">{product.name}</h5>
+              <h5 className="card-title mb-1 fw-bold">
+                <Link 
+                  to={`/product/${product.id}`} 
+                  className="text-dark text-decoration-none"
+                  style={{ transition: 'color 0.2s ease' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#0d6efd'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'inherit'}
+                >
+                  {product.name}
+                </Link>
+              </h5>
               <div className="d-flex align-items-center">
                 <span className={`badge ${product.status ? 'bg-success' : 'bg-secondary'} me-2`}>
                   {product.status ? 'Disponível' : 'Indisponível'}
@@ -138,7 +156,20 @@ const ProductCard = ({ product, onProductUpdate }: Props) => {
               </button>
             </div>
           ) : (
-            <div className="d-grid">
+            <div className="d-grid gap-2">
+              <Link 
+                to={`/product/${product.id}`}
+                className="btn btn-outline-primary"
+                style={{ 
+                  borderRadius: '8px', 
+                  padding: '0.6rem 1.5rem',
+                  fontWeight: '500',
+                  textDecoration: 'none'
+                }}
+              >
+                <i className="bi bi-eye me-2"></i>
+                Ver Detalhes
+              </Link>
               <button 
                 className="btn btn-primary"
                 onClick={handleAddToCart}
@@ -166,6 +197,14 @@ const ProductCard = ({ product, onProductUpdate }: Props) => {
           )}
         </div>
       </div>
+      
+      {/* Modal de Edição */}
+      <ProductFormModal
+        show={showEditModal}
+        onHide={() => setShowEditModal(false)}
+        onProductSaved={handleProductSaved}
+        product={product}
+      />
     </div>
   );
 };

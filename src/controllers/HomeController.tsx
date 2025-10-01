@@ -58,7 +58,7 @@
           onRetry={handleRetry}
           onProductUpdate={loadProducts}
         />
-        <AdminFloatingButton />
+        <AdminFloatingButton onProductAdded={loadProducts} />
       </>
     );
   };

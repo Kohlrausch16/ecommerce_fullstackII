@@ -126,7 +126,7 @@ const ProfilePage: React.FC = () => {
     try {
       const updateData = formData;
       
-      await clientService.updateClient(user.id, updateData);
+      await clientService.updateProfile(user.id, updateData);
       
       setSuccess('Perfil atualizado com sucesso!');
       setIsEditing(false);

@@ -7,6 +7,7 @@ export interface Product {
   length: number;
   color: string[];
   description: string;
+  year?: number;
   status: boolean;
   createdAt: string;
   updatedAt: string;

@@ -64,7 +64,7 @@ class ClientService {
     }
   }
 
-  async updateClient(id: string, clientData: Partial<Client>): Promise<Client> {
+  async updateClient(id: string, clientData: Partial<UpdateClientData>): Promise<Client> {
     try {
       const response = await api.put(`/cliente/${id}`, clientData);
       return response.data;
@@ -76,11 +76,32 @@ class ClientService {
 
   async updateProfile(id: string, clientData: Partial<UpdateClientData>): Promise<Client> {
     try {
-      // Use a rota correta - sem /profile
+      console.log('=== DEBUG JWT TOKEN ===');
+      
+      // Verificar tokens no localStorage
+      const token = localStorage.getItem('accessToken');
+      const refreshToken = localStorage.getItem('refreshToken');
+      const user = localStorage.getItem('user');
+      
+      console.log('🔑 Token JWT:', token ? `${token.substring(0, 20)}...` : 'NÃO ENCONTRADO');
+      console.log('🔄 Refresh Token:', refreshToken ? 'Presente' : 'Ausente');
+      console.log('👤 User data:', user ? JSON.parse(user) : 'Não encontrado');
+      
+      console.log('📡 Fazendo requisição para:', `PUT /cliente/${id}`);
+      console.log('📦 Dados enviados:', clientData);
+      
       const response = await api.put(`/cliente/${id}`, clientData);
+      
+      console.log('✅ Resposta da API:', response.data);
+      console.log('=== FIM DEBUG ===');
+      
       return response.data;
-    } catch (error) {
-      console.error('Erro ao atualizar perfil:', error);
+    } catch (error: any) {
+      console.log('❌ ERRO na requisição:');
+      console.log('Status:', error.response?.status);
+      console.log('Mensagem:', error.response?.data);
+      console.log('Headers enviados:', error.config?.headers);
+      console.error('Erro completo:', error);
       throw error;
     }
   }
@@ -126,21 +147,15 @@ class ClientService {
   async debugClientCart(): Promise<void> {
     try {
       const userData = localStorage.getItem('user');
-      console.log('=== DEBUG CLIENTE CART ===');
-      console.log('User data do localStorage:', userData);
+
       
       if (userData) {
         const user = JSON.parse(userData);
-        console.log('User parseado:', user);
-        console.log('ID do usuário:', user.id);
         
         if (user.id) {
           const client = await this.getClientById(user.id);
-          console.log('Dados completos do cliente:', client);
-          console.log('CartId do cliente:', client.cartId);
         }
       }
-      console.log('=== FIM DEBUG ===');
     } catch (error) {
       console.error('Erro no debug:', error);
     }

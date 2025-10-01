@@ -1,12 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import ProductFormModal from './ProductFormModal';
 
-const AdminFloatingButton: React.FC = () => {
+interface Props {
+  onProductAdded?: () => void;
+}
+
+const AdminFloatingButton: React.FC<Props> = ({ onProductAdded }) => {
   const { isAdmin } = useAuth();
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const handleAddProduct = () => {
-    // fazer adição de produto
-    console.log('Adicionar novo produto');
+    setShowCreateModal(true);
+  };
+
+  const handleProductSaved = () => {
+    if (onProductAdded) {
+      onProductAdded();
+    }
   };
 
   if (!isAdmin) {
@@ -14,6 +25,7 @@ const AdminFloatingButton: React.FC = () => {
   }
 
   return (
+    <>
     <button
       className="btn btn-primary position-fixed d-flex align-items-center justify-content-center"
       style={{
@@ -38,7 +50,14 @@ const AdminFloatingButton: React.FC = () => {
     >
       <i className="bi bi-plus-lg" style={{ fontSize: '1.5rem' }}></i>
     </button>
-  );
+    
+    {/* Modal de Criação */}
+    <ProductFormModal
+      show={showCreateModal}
+      onHide={() => setShowCreateModal(false)}
+      onProductSaved={handleProductSaved}
+    />
+  </>);
 };
 
 export default AdminFloatingButton;
