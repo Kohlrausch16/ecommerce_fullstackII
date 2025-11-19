@@ -8,6 +8,10 @@ import LoginPage from "./views/pages/LoginPage";
 import RegisterPage from "./views/pages/RegisterPage";
 import ProfilePage from "./views/pages/ProfilePage";
 import ProductDetailPage from "./views/pages/ProductDetailPage";
+import SuppliersPage from "./views/pages/SuppliersPage";
+import SupplierFormPage from "./views/pages/SupplierFormPage";
+import AdminDashboard from "./views/pages/AdminDashboard";
+import CartPage from "./views/pages/CartPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -19,6 +23,7 @@ function App() {
             <Routes>
               <Route path="/" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+
               <Route
                 path="/home"
                 element={
@@ -27,6 +32,7 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+
               <Route
                 path="/profile"
                 element={
@@ -35,7 +41,53 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+
               <Route path="/product/:id" element={<ProductDetailPage />} />
+
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/suppliers"
+                element={
+                  <ProtectedRoute>
+                    <SuppliersPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/suppliers/new"
+                element={
+                  <ProtectedRoute>
+                    <SupplierFormPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/suppliers/edit/:id"
+                element={
+                  <ProtectedRoute>
+                    <SupplierFormPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/cart"
+                element={
+                  <ProtectedRoute>
+                    <CartPage />
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
           </main>
         </div>

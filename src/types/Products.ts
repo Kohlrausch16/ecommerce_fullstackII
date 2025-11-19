@@ -9,6 +9,9 @@ export interface Product {
   description: string;
   year?: number;
   status: boolean;
+  stockQtd: number;
+  year: string;
+  supplierId: string;
   createdAt: string;
   updatedAt: string;
   userId: string;

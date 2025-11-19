@@ -61,9 +61,47 @@ const handleFinalizePurchase = async () => {
     <>
       <header className="bg-dark py-2 sticky-top shadow-sm">
         <div className="container d-flex align-items-center">
-          <Link to="/" className="navbar-brand text-white me-3">
+          <Link to="/home" className="navbar-brand text-white me-3">
             <strong>Loja</strong>
           </Link>
+          
+          {/* Menu de navegação para Admin */}
+          {isAuthenticated && user?.role === "admin" && (
+            <div className="dropdown me-3">
+              <button
+                className="btn btn-outline-light btn-sm dropdown-toggle"
+                type="button"
+                id="adminMenuDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i className="bi bi-gear me-1"></i>
+                Admin
+              </button>
+              <ul className="dropdown-menu" aria-labelledby="adminMenuDropdown">
+                <li>
+                  <Link className="dropdown-item" to="/dashboard">
+                    <i className="bi bi-speedometer2 me-2"></i>
+                    Dashboard
+                  </Link>
+                </li>
+                <li>
+                  <Link className="dropdown-item" to="/suppliers">
+                    <i className="bi bi-building me-2"></i>
+                    Fornecedores
+                  </Link>
+                </li>
+                <li><hr className="dropdown-divider" /></li>
+                <li>
+                  <Link className="dropdown-item" to="/home">
+                    <i className="bi bi-box-seam me-2"></i>
+                    Produtos
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          )}
+          
           <form className="d-flex flex-grow-1 me-3" role="search" onSubmit={handleSearch}>
             <input
               className="form-control"
@@ -123,14 +161,26 @@ const handleFinalizePurchase = async () => {
                 </button>
               </>
             )}
-            <button
-              type="button"
-              className="btn btn-link text-white"
-              data-bs-toggle="modal"
-              data-bs-target="#cartModal"
-            >
-              <i className="bi bi-cart"></i> Cart
-            </button>
+            {isAuthenticated && (
+              <Link to="/cart" className="btn btn-link text-white position-relative">
+                <i className="bi bi-cart3"></i> Carrinho
+                {cart?.items && cart.items.length > 0 && (
+                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {cart.items.length}
+                  </span>
+                )}
+              </Link>
+            )}
+            {!isAuthenticated && (
+              <button
+                type="button"
+                className="btn btn-link text-white"
+                data-bs-toggle="modal"
+                data-bs-target="#cartModal"
+              >
+                <i className="bi bi-cart"></i> Cart
+              </button>
+            )}
           </div>
         </div>
 

@@ -49,6 +49,9 @@ class CartItemService {
 
   async removeCartItem(id: string): Promise<void> {
     try {
+      // NOTA: Bug no backend - a rota DELETE está faltando a barra inicial
+      // Deve ser corrigida no backend: cartItemRouter.delete('/item-carrinho/:id', ...)
+      // Por enquanto, usando a rota incorreta do backend
       await api.delete(`/item-carrinho/${id}`);
     } catch (error) {
       console.error('Erro ao remover item do carrinho:', error);

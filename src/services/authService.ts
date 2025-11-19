@@ -67,12 +67,22 @@ class AuthService {
     try {
       const response = await api.post('/login', loginData);
       
-      const token = response.data.token;
-      const refreshToken = response.data.refreshToken;
+      // Backend agora retorna tokens no body
+      let token = response.data?.token;
+      let refreshToken = response.data?.refreshToken;
       
+      // Fallback: tentar dos headers se não vier no body
+      if (!token) {
+        token = response.headers['token'];
+        refreshToken = response.headers['refresh_token'];
+      }
+      
+      console.log('✅ Login response:', response.data);
+      console.log('✅ Token:', token);
+      console.log('✅ RefreshToken:', refreshToken);
       
       if (!token) {
-        throw new Error('Token não recebido do servidor');
+        throw new Error('Token não recebido do servidor.');
       }
       
       let user;

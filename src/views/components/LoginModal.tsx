@@ -29,7 +29,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ show, onHide, onSwitchToRegiste
       setEmail('');
       setPassword('');
       onHide();
-      navigate('/'); // Redireciona para a home após login bem-sucedido
+      navigate('/');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Erro ao fazer login. Verifique suas credenciais.';
       setError(errorMessage);
