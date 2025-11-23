@@ -14,7 +14,7 @@ const SupplierFormPage: React.FC = () => {
     email: "",
     phone: "",
     cnpj: "",
-    adressId: "",
+    adressId: "a1117a8f-86a9-4024-9158-0aa54f6ac001", // ID fixo de endereço existente
   });
 
   const [loading, setLoading] = useState(false);
@@ -35,7 +35,7 @@ const SupplierFormPage: React.FC = () => {
         email: supplier.email,
         phone: supplier.phone,
         cnpj: supplier.cnpj,
-        adressId: supplier.adressId,
+        adressId: supplier.adressId || "a1117a8f-86a9-4024-9158-0aa54f6ac001",
       });
     } catch (err: any) {
       setError(err.message);
@@ -57,7 +57,7 @@ const SupplierFormPage: React.FC = () => {
     setError("");
 
     // Validações básicas
-    if (!formData.name || !formData.email || !formData.phone || !formData.cnpj || !formData.adressId) {
+    if (!formData.name || !formData.email || !formData.phone || !formData.cnpj) {
       setError("Todos os campos são obrigatórios");
       return;
     }
@@ -71,7 +71,8 @@ const SupplierFormPage: React.FC = () => {
       }
       navigate("/suppliers");
     } catch (err: any) {
-      setError(err.message);
+      console.error('Erro ao salvar fornecedor:', err);
+      setError(err.response?.data?.message || err.message || 'Erro ao salvar fornecedor');
     } finally {
       setLoading(false);
     }
@@ -163,22 +164,6 @@ const SupplierFormPage: React.FC = () => {
                         required
                       />
                     </div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label htmlFor="adressId" className="form-label">
-                      ID do Endereço <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="adressId"
-                      name="adressId"
-                      value={formData.adressId}
-                      onChange={handleChange}
-                      placeholder="Ex: 29d9985f-0916-46a0-8105-0416a1e268fb"
-                      required
-                    />
                   </div>
 
                   <div className="d-flex gap-2 justify-content-end">
