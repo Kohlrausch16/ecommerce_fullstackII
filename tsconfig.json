@@ -10,11 +10,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "types": ["jest", "node"],
+    "jsx": "react-jsx"
+    
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

@@ -10,7 +10,7 @@ import ProfilePage from "./views/pages/ProfilePage";
 import ProductDetailPage from "./views/pages/ProductDetailPage";
 import SuppliersPage from "./views/pages/SuppliersPage";
 import SupplierFormPage from "./views/pages/SupplierFormPage";
-import AdminDashboard from "./views/pages/AdminDashboard";
+import AdminDashboard from "./views/pages/AdminDashboard/AdminDashboard";
 import CartPage from "./views/pages/CartPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
