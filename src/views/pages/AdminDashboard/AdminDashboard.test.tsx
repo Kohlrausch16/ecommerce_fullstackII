@@ -5,14 +5,13 @@ import orderService from "../../../services/orderService";
 
 
 
+
 // serviços mockados
-jest.mock("../../../services/orderService", () => ({
+jest.mock("../../../../services/orderService", () => ({
   getMonthlyReport: jest.fn(),
   getMostSoldProduct: jest.fn(),
   getLowStockProducts: jest.fn(),
 }));
-
-
 
 describe("AdminDashboard", () => {
   const mockMonthly = {

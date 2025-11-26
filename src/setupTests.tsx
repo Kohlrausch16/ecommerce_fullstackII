@@ -1,8 +1,7 @@
 import "@testing-library/jest-dom";
 
-// Mock global do fetch (caso algum serviço use)
+// Mock global do fetch
 global.fetch = jest.fn();
 
-// Mock do Header usado no AdminDashboard
+// Mock correto do Header
 jest.mock("./views/components/Header", () => () => <div data-testid="header-mock" />);
-jest.mock("./services/orderService");
