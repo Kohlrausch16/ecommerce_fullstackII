@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Header from "../components/Header";
-import orderService from "../../services/orderService";
-import { MonthlyReport, MostSoldProduct, LowStockProduct } from "../../types/Order";
+import Header from "../../components/Header";
+import orderService from "../../../services/orderService";
+import { MonthlyReport, MostSoldProduct, LowStockProduct } from "../../../types/Order";
 
 const AdminDashboard: React.FC = () => {
   const [monthlyReport, setMonthlyReport] = useState<MonthlyReport | null>(null);
