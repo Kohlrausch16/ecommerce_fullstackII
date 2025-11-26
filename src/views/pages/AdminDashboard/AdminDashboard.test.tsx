@@ -1,16 +1,18 @@
 //import React from "react";
 import { render, waitFor, screen, fireEvent } from "@testing-library/react";
 import AdminDashboard from "./AdminDashboard";
+import orderService from "../../../services/orderService";
+
 
 
 // serviços mockados
-jest.mock("../../services/orderService", () => ({
+jest.mock("../../../services/orderService", () => ({
   getMonthlyReport: jest.fn(),
   getMostSoldProduct: jest.fn(),
   getLowStockProducts: jest.fn(),
 }));
 
-import orderService from "../../../services/orderService";
+
 
 describe("AdminDashboard", () => {
   const mockMonthly = {
